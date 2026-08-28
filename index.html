@@ -460,6 +460,23 @@
         // 全局云端配置中心：整合了壁纸、分类区域 和 【新增】管理员密码
         let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "" };
 
+        // --- favicon 多级 fallback 策略 ---
+        // 第1级：Google favicon API（最稳定）
+        // 第2级：网站自己的 /favicon.ico
+        // 第3级：字母头像（兜底）
+        function navIconError(img, hostname, letter, cls) {
+            if (!img._retried) {
+                img._retried = true;
+                img.src = 'https://' + hostname + '/favicon.ico';
+                img.onerror = function() {
+                    const div = document.createElement('div');
+                    div.className = cls + ' rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0';
+                    div.textContent = letter;
+                    img.replaceWith(div);
+                };
+            }
+        }
+
         let dragType = null; 
         let dragSecId = null; 
         let dragLinkIdx = null;
@@ -787,8 +804,9 @@
 
                     visibleLinks.forEach((link, idx) => {
                         const displayName = getLocalizedLinkName(link.name, link.url);
-                        let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${displayName.charAt(0).toUpperCase()}</div>`;
-                        try { if(link.url) displayIcon = `<img src="https://unavatar.io/duckduckgo/${new URL(link.url).hostname}" draggable="false" onerror="this.style.display='none'" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" />`; } catch(e){}
+                        const _fallbackLetter790 = displayName.charAt(0).toUpperCase();
+                        let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${_fallbackLetter790}</div>`;
+                        try { if(link.url) { const _h790 = new URL(link.url).hostname; displayIcon = `<img src="https://www.google.com/s2/favicons?domain=${_h790}&sz=64" draggable="false" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onerror="navIconError(this,'${_h790}','${_fallbackLetter790}',this.className)" />`; } } catch(e){}
 
                         linksHtml += `
                         <div class="group relative flex items-center justify-between ${pClass} bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-indigo-600/10 transition-all"
@@ -941,8 +959,9 @@
 
             visibleLinks.forEach((item, index) => {
                 const displayName = getLocalizedLinkName(item.name, item.url);
-                let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${displayName.charAt(0).toUpperCase()}</div>`;
-                try { if(item.url) displayIcon = `<img src="https://unavatar.io/duckduckgo/${new URL(item.url).hostname}" draggable="false" onerror="this.style.display='none'" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" />`; } catch(err){}
+                const _fl945 = displayName.charAt(0).toUpperCase();
+                let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${_fl945}</div>`;
+                try { if(item.url) { const _h945 = new URL(item.url).hostname; displayIcon = `<img src="https://www.google.com/s2/favicons?domain=${_h945}&sz=64" draggable="false" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onerror="navIconError(this,'${_h945}','${_fl945}',this.className)" />`; } } catch(err){}
                 
                 container.innerHTML += `
                     <div class="group relative flex items-center justify-between ${pClass} bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-indigo-600/10 transition-all">
