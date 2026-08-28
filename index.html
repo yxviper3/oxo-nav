@@ -461,6 +461,14 @@
         let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "" };
 
         // --- favicon：有就显示图标，没有就显示首字母 ---
+
+        // 【自定义图标映射】对自动获取不到图标的网站，在这里手动指定图标 URL
+        // 格式：'域名': '图标URL'
+        const CUSTOM_ICON_MAP = {
+            'schwab.com': 'https://logo.clearbit.com/schwab.com',
+            'www.schwab.com': 'https://logo.clearbit.com/schwab.com',
+        };
+
         function navIconError(img) {
             // 加载失败 → 显示首字母头像
             const letter = img.dataset.letter || '?';
@@ -805,7 +813,7 @@
                         const displayName = getLocalizedLinkName(link.name, link.url);
                         const _fallbackLetter790 = displayName.charAt(0).toUpperCase();
                         let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${_fallbackLetter790}</div>`;
-                        try { if(link.url) { const _h790 = new URL(link.url).hostname; displayIcon = `<img src="https://www.google.com/s2/favicons?domain=${_h790}&sz=64" draggable="false" data-hostname="${_h790}" data-letter="${_fallbackLetter790}" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onload="navIconLoad(this)" onerror="navIconError(this)" />`; } } catch(e){}
+                        try { if(link.url) { const _h790 = new URL(link.url).hostname; const _customSrc = CUSTOM_ICON_MAP[_h790]; const _iconSrc = _customSrc || `https://www.google.com/s2/favicons?domain=${_h790}&sz=64`; displayIcon = `<img src="${_iconSrc}" draggable="false" data-hostname="${_h790}" data-letter="${_fallbackLetter790}" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onload="navIconLoad(this)" onerror="navIconError(this)" />`; } } catch(e){}
 
                         linksHtml += `
                         <div class="group relative flex items-center justify-between ${pClass} bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-indigo-600/10 transition-all"
@@ -960,7 +968,7 @@
                 const displayName = getLocalizedLinkName(item.name, item.url);
                 const _fl945 = displayName.charAt(0).toUpperCase();
                 let displayIcon = `<div class="${iconSizeClass} rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">${_fl945}</div>`;
-                try { if(item.url) { const _h945 = new URL(item.url).hostname; displayIcon = `<img src="https://www.google.com/s2/favicons?domain=${_h945}&sz=64" draggable="false" data-hostname="${_h945}" data-letter="${_fl945}" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onload="navIconLoad(this)" onerror="navIconError(this)" />`; } } catch(err){}
+                try { if(item.url) { const _h945 = new URL(item.url).hostname; const _customSrc2 = CUSTOM_ICON_MAP[_h945]; const _iconSrc2 = _customSrc2 || `https://www.google.com/s2/favicons?domain=${_h945}&sz=64`; displayIcon = `<img src="${_iconSrc2}" draggable="false" data-hostname="${_h945}" data-letter="${_fl945}" class="${imgSizeClass} rounded object-contain shrink-0" alt="icon" onload="navIconLoad(this)" onerror="navIconError(this)" />`; } } catch(err){}
                 
                 container.innerHTML += `
                     <div class="group relative flex items-center justify-between ${pClass} bg-slate-500/5 border border-slate-500/10 rounded-xl hover:bg-indigo-600/10 transition-all">
