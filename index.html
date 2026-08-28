@@ -460,40 +460,20 @@
         // 全局云端配置中心：整合了壁纸、分类区域 和 【新增】管理员密码
         let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "" };
 
-        // --- favicon 多级 fallback 链 ---
-        // Clearbit Logo API 覆盖率最高，专门收录品牌 Logo，找不到才降级
-        const _NAV_FAV_SVCS = [
-            (h) => `https://logo.clearbit.com/${h}`,
-            (h) => `https://www.google.com/s2/favicons?domain=${h}&sz=64`,
-            (h) => `https://icons.duckduckgo.com/ip3/${h}.ico`,
-            (h) => `https://${h}/favicon.ico`,
-        ];
-        function _navFallbackLetter(img) {
+        // --- favicon：有就显示图标，没有就显示首字母 ---
+        function navIconError(img) {
+            // 加载失败 → 显示首字母头像
             const letter = img.dataset.letter || '?';
             const cls = img.className || '';
             const div = document.createElement('div');
             div.className = cls + ' rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0';
-            div.style.borderRadius = '9999px';
+            div.style.cssText += ';border-radius:9999px';
             div.textContent = letter;
             if (img.parentNode) img.replaceWith(div);
         }
-        function _navTryService(img, idx) {
-            const hostname = img.dataset.hostname;
-            if (!hostname || idx >= _NAV_FAV_SVCS.length) { _navFallbackLetter(img); return; }
-            img._svcIdx = idx;
-            img.onerror = function() { _navTryService(img, idx + 1); };
-            img.onload = function() {
-                // Google(idx=1) & DuckDuckGo(idx=2) 对未知域名返回 16x16 小图标，视为无效
-                if (idx >= 1 && idx <= 2 && img.naturalWidth <= 16 && img.naturalHeight <= 16) {
-                    _navTryService(img, idx + 1);
-                }
-            };
-            img.src = _NAV_FAV_SVCS[idx](hostname);
-        }
-        function navIconError(img) { _navTryService(img, (img._svcIdx || 0) + 1); }
         function navIconLoad(img) {
-            const idx = img._svcIdx || 0;
-            if (idx >= 1 && idx <= 2 && img.naturalWidth <= 16 && img.naturalHeight <= 16) _navTryService(img, idx + 1);
+            // Google 找不到时返回 16x16 地球图标 → 同样显示首字母
+            if (img.naturalWidth <= 16 && img.naturalHeight <= 16) navIconError(img);
         }
 
         let dragType = null; 
