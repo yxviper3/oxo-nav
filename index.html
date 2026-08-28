@@ -461,11 +461,9 @@
         let cloudConfig = { wallpaper: "", dynamicSections: [], adminPwd: "" };
 
         // --- favicon 多级 fallback 链 ---
-        // 依次尝试多个公共 favicon 服务，全部失败后显示字母头像
         const _NAV_FAV_SVCS = [
             (h) => `https://www.google.com/s2/favicons?domain=${h}&sz=64`,
             (h) => `https://icons.duckduckgo.com/ip3/${h}.ico`,
-            (h) => `https://favicon.im/${h}?larger=true`,
             (h) => `https://${h}/favicon.ico`,
         ];
         function _navFallbackLetter(img) {
@@ -483,14 +481,17 @@
             img._svcIdx = idx;
             img.onerror = function() { _navTryService(img, idx + 1); };
             img.onload = function() {
-                // Google & DuckDuckGo 返回 16x16 地球表示没找到
-                if (img.naturalWidth <= 16 && img.naturalHeight <= 16) _navTryService(img, idx + 1);
+                // Google & DuckDuckGo 对未知域名返回 16x16 小图标，判定为无效
+                if (idx < 2 && img.naturalWidth <= 16 && img.naturalHeight <= 16) {
+                    _navTryService(img, idx + 1);
+                }
             };
             img.src = _NAV_FAV_SVCS[idx](hostname);
         }
         function navIconError(img) { _navTryService(img, (img._svcIdx || 0) + 1); }
         function navIconLoad(img) {
-            if (img.naturalWidth <= 16 && img.naturalHeight <= 16) _navTryService(img, 1);
+            const idx = img._svcIdx || 0;
+            if (idx < 2 && img.naturalWidth <= 16 && img.naturalHeight <= 16) _navTryService(img, idx + 1);
         }
 
         let dragType = null; 
